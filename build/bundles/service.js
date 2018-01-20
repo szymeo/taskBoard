@@ -23,7 +23,7 @@ class taskboardService {
                 method: 'POST',
                 body: JSON.stringify({'a':'s'}), 
                 headers: new Headers({
-                'Content-Type': 'application/json'
+                    'Content-Type': 'application/json'
                 })
             })
             .then(res => res.json())
@@ -34,14 +34,14 @@ class taskboardService {
 }
 
 class interfaceService {
-    constructor(element, boards) {
+    constructor(element, data) {
         this.interface = element;
-        this.boards = boards;
+        this.interfaceData = data;
     }
 
     buildBoardsTable() {
         var tables = ``;
-        this.boards.map((board, index) => {
+        this.interfaceData['boards'].map((board, index) => {
             tables += this.buildBoard(board);
         })
 
@@ -49,9 +49,10 @@ class interfaceService {
     }
 
     buildBoard(board) {
-        let thRow = this.buildTHead(board.tasks[0]);
-        let tdRows = this.buildTBody(board.tasks);
-        return `<table id="${board['board']}">${thRow}${tdRows}</table>`
+        const [boardTitle] = Object.keys(board);
+        let thRow = this.buildTHead(board[boardTitle].tasks[0]);
+        let tdRows = this.buildTBody(board[boardTitle].tasks);
+        return `<table id="${boardTitle}">${thRow}${tdRows}</table>`
     }
 
     buildTBody(tasks) {
@@ -90,6 +91,7 @@ class interfaceService {
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
         _this.boards = await service.getBoards();
+        document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards, null, 10);
         taskboard.innerHTML = '';
         _this.interface = new interfaceService(taskboard, _this.boards);
         _this.interface.buildBoardsTable();

@@ -6,11 +6,43 @@
             // import { hello } from './bundles/service.js';
 
             // hello();
-        </script>
+        </script> 
+
+        <style>
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            taskboard > table {
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            taskboard > table td, taskboard > table th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            taskboard > table tr:nth-child(even){background-color: #f2f2f2;}
+
+            taskboard > table tr:hover {background-color: #ddd;}
+
+            taskboard > table th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: left;
+                background-color: #E91E63;
+                color: white;
+            }
+        </style>
     </head>
 
     <body>
         <taskboard></taskboard>
+
+        <demo-out></demo-out>
 
         <script src="./bundles/service.js" apiUrl="/api/v1/taskboard/"></script>
     </body>

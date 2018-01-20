@@ -5,27 +5,33 @@ const mongoose = require('mongoose');
 app.use('/', express.static('../build'))
 
 app.get('/api/v1/taskboard', (req, res) => {
-    res.send([{
-        "board":"past",
-        "tasks":[{
-            title: "bmw", deadline: "12/12/2020"
+    res.send({
+        "boards":[{
+            "past": {
+                "tasks":[{
+                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
+                }]
+            }
         },{
-            title: "google", deadline: "12/12/2020"
-        },{
-            title: "yahoo", deadline: "12/12/2020"
-        },{
-            title: "microsoft", deadline: "12/12/2020"
-        }]},{
-        "board":"actuall",
-        "tasks":[{
-            title: "bmw", deadline: "12/12/2020"
-        },{
-            title: "google", deadline: "12/12/2020"
-        },{
-            title: "yahoo", deadline: "12/12/2020"
-        },{
-            title: "microsoft", deadline: "12/12/2020"
-        }]}]);
+            "actuall": {
+                "tasks":[{
+                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
+                },{
+                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
+                }]
+            }
+        }]
+    });
 })
 
 app.post('/api/v1/taskboard', (req, res) => {
