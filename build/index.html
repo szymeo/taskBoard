@@ -1,12 +1,7 @@
 <html>
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-
-        <script>
-            // import { hello } from './bundles/service.js';
-
-            // hello();
-        </script> 
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
 
         <style>
             body {
@@ -14,28 +9,64 @@
                 padding: 0 !important;
             }
 
-            taskboard > table {
-                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-                border-collapse: collapse;
+            taskboard {
                 width: 100%;
             }
 
-            taskboard > table td, taskboard > table th {
-                border: 1px solid #ddd;
-                padding: 8px;
+            taskboard * {
+                outline: 0;
+                box-sizing: border-box;
             }
 
-            taskboard > table tr:nth-child(even){background-color: #f2f2f2;}
+            taskboard > section > table {
+                font-family: "Roboto", sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                border-spacing: 0;
+            }
 
-            taskboard > table tr:hover {background-color: #ddd;}
+            taskboard > section > table td, taskboard > table th {
+                border: 1px solid #ddd;
+                padding: 8px;
+                border-top:0;
+                border-right:0;
+            }
 
-            taskboard > table th {
+            taskboard > section > table tr:nth-child(even){background-color: #f2f2f2;}
+
+            taskboard > section > table tr:hover {background-color: #ddd;}
+
+            taskboard > section > table th {
                 padding-top: 12px;
                 padding-bottom: 12px;
                 text-align: left;
                 background-color: #E91E63;
                 color: white;
             }
+
+            taskboard h4 > input {
+                font-size: 24px;
+            }
+
+            taskboard section.board > h4 > input {
+                font-family: "Roboto", sans-serif;
+                border: 1px solid transparent;
+                padding: 6px 2px;
+                font-weight: 300;
+            }
+
+            taskboard section.board > h4 > input:hover, section.board > h4 > input:focus {
+                border: 1px dashed #333;
+            }
+
+            /* disable input syntax check */
+
+            taskboard input::-webkit-validation-bubble-message, 
+            taskboard select::-webkit-validation-bubble-message,
+            taskboard textarea::-webkit-validation-bubble-message {
+                display:none;
+            } 
+
         </style>
     </head>
 

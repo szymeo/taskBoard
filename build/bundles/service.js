@@ -1,9 +1,11 @@
-class taskboardService {
+'use strict';
+
+class TaskboardService {
     constructor(url) {
         this.apiUrl = url;
     }
     
-    getBoards() {
+    get getBoards() {
         return new Promise((resolve, reject) => {
             fetch(this.apiUrl, {
                 method: 'GET',
@@ -17,7 +19,7 @@ class taskboardService {
         })
     }
 
-    addTask(data) {
+    set addTask(data) {
         return new Promise((resolve, reject) => {
             fetch(this.apiUrl, {
                 method: 'POST',
@@ -33,7 +35,7 @@ class taskboardService {
     }
 }
 
-class interfaceService {
+class InterfaceService {
     constructor(element, data) {
         this.interface = element;
         this.interfaceData = data;
@@ -41,7 +43,7 @@ class interfaceService {
 
     buildBoardsTable() {
         var tables = ``;
-        this.interfaceData['boards'].map((board, index) => {
+        this.interfaceData.map((board, index) => {
             tables += this.buildBoard(board);
         })
 
@@ -52,7 +54,12 @@ class interfaceService {
         const [boardTitle] = Object.keys(board);
         let thRow = this.buildTHead(board[boardTitle].tasks[0]);
         let tdRows = this.buildTBody(board[boardTitle].tasks);
-        return `<table id="${boardTitle}">${thRow}${tdRows}</table>`
+        return `<section class="board">
+                    <h4>
+                        <input type="text" id="update-board-title" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
+                    </h4>
+                    <table id="${boardTitle}">${thRow}${tdRows}</table>
+                </section>`
     }
 
     buildTBody(tasks) {
@@ -78,22 +85,55 @@ class interfaceService {
     }
 }
 
-(function(url) {
-    var _this = this;
-    const apiUrl = document.currentScript.getAttribute('apiUrl');
+class EventsService {
+    constructor(boards) {
+        this.boards = boards;
+    }
+
+    updateBoardTitle(oldTitle, newTitle) {
+        var eventBoard = this.getBoardById(oldTitle);
+        var boardIndex = this.boards.indexOf(eventBoard);
+        var newBoard = this.renameKeys(eventBoard, {[oldTitle]:newTitle});
+        this.boards[boardIndex] = newBoard;
+        
+        document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
+    }
+
+    getBoardById(id) {
+        console.log(this.boards);
+        function findBoard(board) {
+            return board[id];
+        }
+
+        return this.boards.find(findBoard)
+    }
+
+    renameKeys(obj, newKeys) {
+        const keyValues = Object.keys(obj).map(key => {
+          const newKey = newKeys[key] || key;
+          return { [newKey]: obj[key] };
+        });
+        return Object.assign({}, ...keyValues);
+    }
+}
+
+(function() {
+    var _this = this || {};
     const taskboard = document.querySelector('taskboard');
-    const service = new taskboardService(apiUrl);
+    const apiUrl = document.currentScript.getAttribute('apiUrl');
+    const service = new TaskboardService(apiUrl);
 
     // service.addTask()
     //     .then((data) => console.log(data))
-    //     .catch((e) => console.error(e))
+    //     .catch((e) => console.error(e)) 
 
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
-        _this.boards = await service.getBoards();
-        document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards, null, 10);
+        _this.boards = await service.getBoards;
+        window.eventHandler = new EventsService(_this.boards['boards']);
+        document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
         taskboard.innerHTML = '';
-        _this.interface = new interfaceService(taskboard, _this.boards);
+        _this.interface = new InterfaceService(taskboard, _this.boards['boards']);
         _this.interface.buildBoardsTable();
     }();
 })();
