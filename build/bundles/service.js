@@ -3,7 +3,7 @@ class taskboardService {
         this.apiUrl = url;
     }
     
-    getTasks() {
+    getBoards() {
         return new Promise((resolve, reject) => {
             fetch(this.apiUrl, {
                 method: 'GET',
@@ -34,28 +34,46 @@ class taskboardService {
 }
 
 class interfaceService {
-    constructor(element, tasks) {
+    constructor(element, boards) {
         this.interface = element;
-        this.tasks = tasks;
+        this.boards = boards;
     }
 
-    buildTaskTable() {
-        let table = document.createElement("table");
-        var header = table.createTHead(), body = table.createTBody();
-        this.interface.appendChild(table);
-        var headRow, bodyRow, i = 0, rowCount = 0;
-
-        this.tasks.map((task) => {
-            headRow = header.insertRow(rowCount);
-            bodyRow = body.insertRow(rowCount);
-            rowCount++;
-            for(var k in task) {
-                headRow.insertCell(i).innerHTML = k;
-                bodyRow.insertCell(i).innerHTML = task[k];
-                i++;
-            }
-            i = 0;
+    buildBoardsTable() {
+        var tables = ``;
+        this.boards.map((board, index) => {
+            tables += this.buildBoard(board);
         })
+
+        this.interface.innerHTML = tables;
+    }
+
+    buildBoard(board) {
+        let thRow = this.buildTHead(board.tasks[0]);
+        let tdRows = this.buildTBody(board.tasks);
+        return `<table id="${board['board']}">${thRow}${tdRows}</table>`
+    }
+
+    buildTBody(tasks) {
+        var tdRows = ``, row = ``;
+
+        tasks.map((task) => {
+            for(var k in task) {
+                row += `<td>${task[k]}</td>`;
+            }
+            tdRows += `<tr>${row}</tr>`;
+            row = ``;
+        })
+
+        return tdRows;
+    }
+
+    buildTHead(headings) {
+        var thCells = ``;
+        for(var k in headings) {
+            thCells += `<th>${k}</th>`
+        }
+        return `<tr>${thCells}</tr>`
     }
 }
 
@@ -71,10 +89,10 @@ class interfaceService {
 
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
-        _this.tasks = await service.getTasks();
+        _this.boards = await service.getBoards();
         taskboard.innerHTML = '';
-        _this.interface = new interfaceService(taskboard, _this.tasks);
-        _this.interface.buildTaskTable();
+        _this.interface = new interfaceService(taskboard, _this.boards);
+        _this.interface.buildBoardsTable();
     }();
 })();
 
