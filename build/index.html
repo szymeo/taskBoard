@@ -23,19 +23,21 @@
                 width: 100%;
             }
 
-            taskboard > table th {
+            taskboard > section > table th {
                 color: #333;
-                font-size: 18px;
+                font-size: 13px;
                 font-weight: 400;
-                font-family: 'Roboto', sans-serif;    
+                padding: 8px 4px;
             }
 
             taskboard > section > table td {
                 font-size: 13px;
                 margin-left: 15px;
+                font-weight: 400;
                 background-color: #f0f0f0;
                 border-bottom: 1px solid #e6e6e6;
-                padding: 6px;
+                padding: 8px 4px;
+                text-align: center
             }
 
             taskboard > section > table th:hover {
@@ -67,6 +69,20 @@
 
             taskboard section.board > h4 > input:hover, section.board > h4 > input:focus {
                 border: 1px dashed #333;
+            }
+
+            taskboard section.board th > input {
+                font-family: "Roboto", sans-serif;
+                border: 1px solid transparent;
+                padding: 6px 2px;
+                font-weight: 300;
+                text-align: center;
+                background-color: transparent;
+            }
+
+            taskboard section.board th > input:hover, section.board th > input:focus {
+                border: 1px dashed #333;
+                background-color: #fff;
             }
 
             /* disable input syntax check */

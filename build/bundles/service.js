@@ -52,11 +52,11 @@ class InterfaceService {
 
     buildBoard(board) {
         const [boardTitle] = Object.keys(board);
-        let thRow = this.buildTHead(board[boardTitle].tasks[0]);
+        let thRow = this.buildTHead(board[boardTitle].tasks[0], boardTitle);
         let tdRows = this.buildTBody(board[boardTitle].tasks);
         return `<section class="board">
                     <h4>
-                        <input type="text" id="update-board-title" data-model="${boardTitle}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
+                        <input type="text" id="update-board-title" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
                     </h4>
                     <table cellspacing="1" id="${boardTitle}">${thRow}${tdRows}</table>
                 </section>`
@@ -76,10 +76,10 @@ class InterfaceService {
         return tdRows;
     }
 
-    buildTHead(headings) {
+    buildTHead(headings, boardTitle) {
         var thCells = ``;
         for(var k in headings) {
-            thCells += `<th>${k}</th>`
+            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${k}" oninput='eventHandler.updateBoardHeader("${k}", this.value)' value="${k}" spellcheck="false" /></th>`
         }
         return `<tr>${thCells}</tr>`
     }
@@ -91,15 +91,19 @@ class EventsService {
     }
 
     updateBoardTitle(oldTitle, newTitle) {
-        const thisInput = document.querySelector(`input[data-model=${oldTitle}]`);
+        const thisInput = document.querySelector(`input[data-board="${oldTitle.hashCode()}"]`);
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value)`);
-        thisInput.dataset.model = newTitle;
+        thisInput.dataset.board = newTitle.hashCode();
         var eventBoard = this.getBoardById(oldTitle);
         var boardIndex = this.boards.indexOf(eventBoard);
         var newBoard = this.renameKeys(eventBoard, {[oldTitle]:newTitle});
-        this.boards[boardIndex] = newBoard;
+        this.boards[boardIndex] = JSON.parse(JSON.stringify(newBoard));
         
         document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
+    }
+
+    updateBoardHeader(oldHeader, newHeader) {
+
     }
 
     getBoardById(id) {
@@ -139,6 +143,17 @@ class EventsService {
         _this.interface.buildBoardsTable();
     }();
 })();
+
+String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
 
 
 
