@@ -56,7 +56,7 @@ class InterfaceService {
         let tdRows = this.buildTBody(board[boardTitle].tasks);
         return `<section class="board">
                     <h4>
-                        <input type="text" id="update-board-title" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
+                        <input type="text" id="update-board-title" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, this)' spellcheck="false" />
                     </h4>
                     <table id="${boardTitle}">${thRow}${tdRows}</table>
                 </section>`
@@ -90,7 +90,8 @@ class EventsService {
         this.boards = boards;
     }
 
-    updateBoardTitle(oldTitle, newTitle) {
+    updateBoardTitle(oldTitle, newTitle, fallbackElem) {
+        fallbackElem.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, this)`);
         var eventBoard = this.getBoardById(oldTitle);
         var boardIndex = this.boards.indexOf(eventBoard);
         var newBoard = this.renameKeys(eventBoard, {[oldTitle]:newTitle});
