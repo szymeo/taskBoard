@@ -56,9 +56,9 @@ class InterfaceService {
         let tdRows = this.buildTBody(board[boardTitle].tasks);
         return `<section class="board">
                     <h4>
-                        <input type="text" id="update-board-title" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, this)' spellcheck="false" />
+                        <input type="text" id="update-board-title" data-model="${boardTitle}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
                     </h4>
-                    <table id="${boardTitle}">${thRow}${tdRows}</table>
+                    <table cellspacing="1" id="${boardTitle}">${thRow}${tdRows}</table>
                 </section>`
     }
 
@@ -90,8 +90,10 @@ class EventsService {
         this.boards = boards;
     }
 
-    updateBoardTitle(oldTitle, newTitle, fallbackElem) {
-        fallbackElem.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, this)`);
+    updateBoardTitle(oldTitle, newTitle) {
+        const thisInput = document.querySelector(`input[data-model=${oldTitle}]`);
+        thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value)`);
+        thisInput.dataset.model = newTitle;
         var eventBoard = this.getBoardById(oldTitle);
         var boardIndex = this.boards.indexOf(eventBoard);
         var newBoard = this.renameKeys(eventBoard, {[oldTitle]:newTitle});
@@ -101,7 +103,6 @@ class EventsService {
     }
 
     getBoardById(id) {
-        console.log(this.boards);
         function findBoard(board) {
             return board[id];
         }
@@ -122,7 +123,7 @@ class EventsService {
     var _this = this || {};
     const taskboard = document.querySelector('taskboard');
     const apiUrl = document.currentScript.getAttribute('apiUrl');
-    const service = new TaskboardService(apiUrl);
+    const apiService = new TaskboardService(apiUrl);
 
     // service.addTask()
     //     .then((data) => console.log(data))
@@ -130,7 +131,7 @@ class EventsService {
 
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
-        _this.boards = await service.getBoards;
+        _this.boards = await apiService.getBoards;
         window.eventHandler = new EventsService(_this.boards['boards']);
         document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
         taskboard.innerHTML = '';
