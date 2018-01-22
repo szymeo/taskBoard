@@ -7,7 +7,7 @@ app.use('/', express.static('../build'))
 app.get('/api/v1/taskboard', (req, res) => {
     res.send({
         "boards":[{
-            "past": {
+            "Sprint 1 - done": {
                 "primaryColor":'rgb(162, 93, 220)',
                 "tasks":[{
                     text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
@@ -20,7 +20,7 @@ app.get('/api/v1/taskboard', (req, res) => {
                 }]
             }
         },{
-            "actuall": {
+            "Sprint 2 - aktualnie": {
                 "primaryColor":'rgb(226, 68, 92)',
                 "tasks":[{
                     text: 'build brand new car', title: "bmw", deadline: "12/12/2020"

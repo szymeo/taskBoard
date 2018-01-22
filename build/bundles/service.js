@@ -101,6 +101,7 @@ class EventsService {
     }
 
     updateBoardTitle(oldTitle, newTitle, boardIndex) {
+        newTitle = newTitle.replace(/([\\\"])/g, '');
         const thisInput = document.querySelector(`table[data-id="${boardIndex}"] th > h4 > input`);
         newTitle.length <= 0 ? newTitle = `Board_title_${boardIndex}` : '';
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
@@ -111,6 +112,7 @@ class EventsService {
     }
 
     updateBoardHeader(oldHeader, newHeader) {
+        newHeader = newHeader.replace(/\\/g, '');
         const thisInput = document.querySelector(`input[data-board="${oldTitle.hashCode()}"]data-header="${oldHeader.hashCode()}"`);
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardHeader("${newTitle}", this.value)`);
         thisInput.dataset.board = newTitle.hashCode();
