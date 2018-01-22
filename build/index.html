@@ -21,13 +21,15 @@
             taskboard > section > table {
                 font-family: "Roboto", sans-serif;
                 width: 100%;
+                padding-left: 15px;
+                padding-right: 15px;
             }
 
             taskboard > section > table th {
                 color: #333;
                 font-size: 13px;
                 font-weight: 400;
-                padding: 8px 4px;
+                padding: 4px 2px;
             }
 
             taskboard > section > table td {
@@ -36,8 +38,14 @@
                 font-weight: 400;
                 background-color: #f0f0f0;
                 border-bottom: 1px solid #e6e6e6;
-                padding: 8px 4px;
+                height: 34px;
                 text-align: center
+            }
+
+            taskboard > section > table td > span {
+                float:left;
+                line-height: 34px;
+                padding: 0 6px;
             }
 
             taskboard > section > table th:hover {
@@ -48,27 +56,36 @@
                 background-color: #f5f5f5;
             }
 
-            td:first-child {
-                padding-left: 0;
+            taskboard th.board-title {
+                text-align: left;
             }
 
-            td:last-child {
-                padding-right: 0;
+            taskboard th.board-title > h4 > input {
+                font-size: 18px;
             }
 
-            taskboard h4 > input {
-                font-size: 24px;
-            }
-
-            taskboard section.board > h4 > input {
+            taskboard th.board-title > h4 > input {
                 font-family: "Roboto", sans-serif;
                 border: 1px solid transparent;
-                padding: 6px 2px;
+                padding: 2px 0px;
                 font-weight: 300;
             }
 
-            taskboard section.board > h4 > input:hover, section.board > h4 > input:focus {
+            taskboard th.board-title > h4 > input:hover {
                 border: 1px dashed #333;
+            }
+
+            taskboard th.board-title > h4 > input:focus {
+                border: 1px dashed #333;
+                width: 100%;
+            }
+
+            taskboard th.board-title > h4 {
+                margin: 0;
+            }
+
+            taskboard th.board-title:hover {
+                background: transparent;
             }
 
             taskboard section.board th > input {
@@ -91,7 +108,13 @@
             taskboard select::-webkit-validation-bubble-message,
             taskboard textarea::-webkit-validation-bubble-message {
                 display:none;
-            } 
+            }
+
+            taskboard div.row-select {
+                width: 8px;
+                height: 34px;
+                float: left;
+            }
 
         </style>
     </head>

@@ -52,22 +52,26 @@ class InterfaceService {
 
     buildBoard(board, boardIndex) {
         const [boardTitle] = Object.keys(board);
-        let thRow = this.buildTHead(board[boardTitle].tasks[0], boardTitle);
-        let tdRows = this.buildTBody(board[boardTitle].tasks);
+        let thRow = this.buildTHead(board[boardTitle].tasks[0], boardTitle, boardIndex, board[boardTitle].primaryColor);
+        let tdRows = this.buildTBody(board[boardTitle].tasks, board[boardTitle].primaryColor);
         return `<section class="board" data-id="${boardIndex}">
-                    <h4>
-                        <input type="text" id="update-board-title" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
-                    </h4>
                     <table cellspacing="1" data-id="${boardIndex}">${thRow}${tdRows}</table>
                 </section>`
     }
 
-    buildTBody(tasks) {
-        var tdRows = ``, row = ``;
+    buildTBody(tasks, primaryColor) {
+        var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${primaryColor}"></div>`, i = 0;
 
         tasks.map((task) => {
+            i = 0;
             for(var k in task) {
-                row += `<td>${task[k]}</td>`;
+                row += `
+                    <td>
+                        ${i == 0 ? firstCellStyle : ''}
+                        <span>${task[k]}</span>
+                    </td>
+                `;
+                i++;
             }
             tdRows += `<tr>${row}</tr>`;
             row = ``;
@@ -76,9 +80,15 @@ class InterfaceService {
         return tdRows;
     }
 
-    buildTHead(headings, boardTitle) {
+    buildTHead(headings, boardTitle, boardIndex, primaryColor) {
         var thCells = ``;
         for(var k in headings) {
+            if(k === "text") thCells += `<th class="board-title">
+                <h4>
+                    <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Board title" maxlength="50" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
+                </h4>
+            </th>`
+        else
             thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-cell="${k}" oninput='eventHandler.updateBoardHeader("${k}", this.value)' value="${k}" spellcheck="false" /></th>`
         }
         return `<tr>${thCells}</tr>`
@@ -92,7 +102,7 @@ class EventsService {
 
     updateBoardTitle(oldTitle, newTitle, boardIndex) {
         const thisInput = document.querySelector(`section[data-id="${boardIndex}"] > h4 > input`);
-        newTitle.length <= 0 ? newTitle = 'boardTitle' : '';
+        newTitle.length <= 0 ? newTitle = `Board_title_${boardIndex}` : '';
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
         var newBoard = this.renameKeys(this.boards[boardIndex], {[oldTitle || "key"]:newTitle});
         this.boards[boardIndex] = JSON.parse(JSON.stringify(newBoard));
