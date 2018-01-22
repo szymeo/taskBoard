@@ -44,21 +44,21 @@ class InterfaceService {
     buildBoardsTable() {
         var tables = ``;
         this.interfaceData.map((board, index) => {
-            tables += this.buildBoard(board);
+            tables += this.buildBoard(board, index);
         })
 
         this.interface.innerHTML = tables;
     }
 
-    buildBoard(board) {
+    buildBoard(board, boardIndex) {
         const [boardTitle] = Object.keys(board);
         let thRow = this.buildTHead(board[boardTitle].tasks[0], boardTitle);
         let tdRows = this.buildTBody(board[boardTitle].tasks);
-        return `<section class="board">
+        return `<section class="board" data-id="${boardIndex}">
                     <h4>
-                        <input type="text" id="update-board-title" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value)' spellcheck="false" />
+                        <input type="text" id="update-board-title" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
                     </h4>
-                    <table cellspacing="1" id="${boardTitle}">${thRow}${tdRows}</table>
+                    <table cellspacing="1" data-id="${boardIndex}">${thRow}${tdRows}</table>
                 </section>`
     }
 
@@ -79,7 +79,7 @@ class InterfaceService {
     buildTHead(headings, boardTitle) {
         var thCells = ``;
         for(var k in headings) {
-            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${k}" oninput='eventHandler.updateBoardHeader("${k}", this.value)' value="${k}" spellcheck="false" /></th>`
+            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-cell="${k}" oninput='eventHandler.updateBoardHeader("${k}", this.value)' value="${k}" spellcheck="false" /></th>`
         }
         return `<tr>${thCells}</tr>`
     }
@@ -90,9 +90,19 @@ class EventsService {
         this.boards = boards;
     }
 
-    updateBoardTitle(oldTitle, newTitle) {
-        const thisInput = document.querySelector(`input[data-board="${oldTitle.hashCode()}"]`);
-        thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value)`);
+    updateBoardTitle(oldTitle, newTitle, boardIndex) {
+        const thisInput = document.querySelector(`section[data-id="${boardIndex}"] > h4 > input`);
+        newTitle.length <= 0 ? newTitle = 'boardTitle' : '';
+        thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
+        var newBoard = this.renameKeys(this.boards[boardIndex], {[oldTitle || "key"]:newTitle});
+        this.boards[boardIndex] = JSON.parse(JSON.stringify(newBoard));
+        
+        document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
+    }
+
+    updateBoardHeader(oldHeader, newHeader) {
+        const thisInput = document.querySelector(`input[data-board="${oldTitle.hashCode()}"]data-header="${oldHeader.hashCode()}"`);
+        thisInput.setAttribute('oninput',  `eventHandler.updateBoardHeader("${newTitle}", this.value)`);
         thisInput.dataset.board = newTitle.hashCode();
         var eventBoard = this.getBoardById(oldTitle);
         var boardIndex = this.boards.indexOf(eventBoard);
@@ -102,16 +112,20 @@ class EventsService {
         document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
     }
 
-    updateBoardHeader(oldHeader, newHeader) {
-
-    }
-
     getBoardById(id) {
         function findBoard(board) {
             return board[id];
         }
 
         return this.boards.find(findBoard)
+    }
+
+    getCellById(board, id) {
+        function findCell(cell) {
+            return cell[id];
+        }
+
+        return this.boards[board].tasks.find(findCell);
     }
 
     renameKeys(obj, newKeys) {
