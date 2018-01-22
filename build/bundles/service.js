@@ -101,7 +101,7 @@ class EventsService {
     }
 
     updateBoardTitle(oldTitle, newTitle, boardIndex) {
-        const thisInput = document.querySelector(`section[data-id="${boardIndex}"] > h4 > input`);
+        const thisInput = document.querySelector(`table[data-id="${boardIndex}"] th > h4 > input`);
         newTitle.length <= 0 ? newTitle = `Board_title_${boardIndex}` : '';
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
         var newBoard = this.renameKeys(this.boards[boardIndex], {[oldTitle || "key"]:newTitle});
