@@ -68,7 +68,7 @@ class InterfaceService {
                 row += `
                     <td>
                         ${i == 0 ? firstCellStyle : ''}
-                        <span>${task[k]}</span>
+                        <span ${i == 0 ? 'class="left"' : ''}>${task[k]}</span>
                     </td>
                 `;
                 i++;
@@ -81,7 +81,7 @@ class InterfaceService {
     }
 
     buildTHead(headings, boardTitle, boardIndex, primaryColor) {
-        var thCells = ``;
+        var thCells = ``, i = 0;
         for(var k in headings) {
             if(k === "text") thCells += `<th class="board-title">
                 <h4>
@@ -89,7 +89,8 @@ class InterfaceService {
                 </h4>
             </th>`
         else
-            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-cell="${k}" oninput='eventHandler.updateBoardHeader("${k}", this.value)' value="${k}" spellcheck="false" /></th>`
+            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader("${k}", this.value, ${boardIndex})' value="${k}" spellcheck="false" /></th>`
+            i++;
         }
         return `<tr>${thCells}</tr>`
     }
