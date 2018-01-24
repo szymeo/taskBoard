@@ -4,37 +4,7 @@ const mongoose = require('mongoose');
 
 app.use('/', express.static('../build'))
 
-app.get('/api/v1/taskboard', (req, res) => {
-    res.send({
-        "boards":[{
-            "Sprint 1 - done": {
-                "primaryColor":'rgb(162, 93, 220)',
-                "tasks":[{
-                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
-                }]
-            }
-        },{
-            "Sprint 2 - aktualnie": {
-                "primaryColor":'rgb(226, 68, 92)',
-                "tasks":[{
-                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
-                }]
-            }
-        }]
-    });
-})
+app.use('/api/v1/taskboard', require("./endpoints"));
 
 app.post('/api/v1/taskboard', (req, res) => {
     res.send({"post":"data"});
