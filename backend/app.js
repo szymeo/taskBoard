@@ -6,10 +6,6 @@ app.use('/', express.static('../build'))
 
 app.use('/api/v1/taskboard', require("./endpoints"));
 
-app.post('/api/v1/taskboard', (req, res) => {
-    res.send({"post":"data"});
-})
-
 mongoose.connect(`mongodb://localhost:27017/taskboard`);
 mongoose.connection.on('error', function () {
     console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
