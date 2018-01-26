@@ -5,6 +5,21 @@ class TaskboardService {
         this.apiUrl = url;
     }
     
+    updateBoard(boardObj) {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}board/${boardObj._id}`, {
+                method: 'PUT',
+                headers: new Headers({
+                  'Content-Type': 'application/json'
+                }),
+                body: boardObj
+            })
+            .then(res => res.json())
+            .catch(error => reject('Error:', error))
+            .then(response => setTimeout(() => resolve(response), 1000));
+        })
+    }
+
     get getBoards() {
         return new Promise((resolve, reject) => {
             fetch(this.apiUrl, {
@@ -97,7 +112,8 @@ class InterfaceService {
 }
 
 class EventsService {
-    constructor(boards) {
+    constructor(boards, api) {
+        this.api = api;
         this.boards = boards;
     }
 
@@ -108,6 +124,8 @@ class EventsService {
         thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
         var newBoard = this.renameKeys(this.boards[boardIndex], {[oldTitle || "key"]:newTitle});
         this.boards[boardIndex] = JSON.parse(JSON.stringify(newBoard));
+        this.boards[boardIndex].title = newTitle;
+        this.api.updateBoard(this.boards[boardIndex]);
         
         document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
     }
@@ -163,7 +181,7 @@ class EventsService {
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
         _this.boards = await apiService.getBoards;
-        window.eventHandler = new EventsService(_this.boards['boards']);
+        window.eventHandler = new EventsService(_this.boards['boards'], apiService);
         document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
         taskboard.innerHTML = '';
         _this.interface = new InterfaceService(taskboard, _this.boards['boards']);

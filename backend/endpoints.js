@@ -32,6 +32,12 @@ router.put('/board/:boardId', (req, res) => {
     })
 })
 
+router.put('/board/:boardId', (req, res) => {
+    Board.findOne({_id: req.params.boardId}).exec((err, board) => {
+
+    })
+})
+
 router.post('/task/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
         var task = new Task({
