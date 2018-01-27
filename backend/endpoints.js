@@ -32,16 +32,26 @@ router.put('/board/:boardId', (req, res) => {
     })
 })
 
-router.put('/board/:boardId', (req, res) => {
-    Board.findOne({_id: req.params.boardId}).exec((err, board) => {
+router.post('/board', (req, res) => {
+    var board = new Board({
+        title: "New board",
+        primaryColor: 'rgb(162, 93, 220)',
+        cols: [
+            'text',
+            'Performer',
+            'Deadline'
+        ]
+    })
 
+    board.save((err) => {
+        err ? res.send(err).status(403) : res.send(board).status(200);
     })
 })
 
 router.post('/task/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
         var task = new Task({
-            board: req.body.board
+            
         })
 
         task.save((err) => {
@@ -61,35 +71,51 @@ router.put('/task/:boardId', (req, res) => {
 })
 
 router.get('/', (req, res) => {
-    res.send({
-        "boards":[{
-            "Sprint 1 - done": {
-                "primaryColor":'rgb(162, 93, 220)',
-                "tasks":[{
-                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
-                }]
-            }
-        },{
-            "Sprint 2 - aktualnie": {
-                "primaryColor":'rgb(226, 68, 92)',
-                "tasks":[{
-                    text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "google", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
-                },{
-                    text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
-                }]
-            }
-        }]
-    });
+    var _this = this;
+    Board.find({}).exec((err, boards) => {
+        _this.boards = [];
+        var temp = {};
+
+        for(var i = 0; i < boards.length; i++) {
+            temp[boards[i].title] = boards[i];
+            _this.boards.push(temp);
+            temp = {};
+        }
+
+        res.send({
+            boards:_this.boards,
+            "someboards":[{
+                "Sprint 1 - done": {
+                    "primaryColor":'rgb(162, 93, 220)',
+                    "tasks":[{
+                        text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "google", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
+                    }]
+                }
+            },{
+                "Sprint 2 - aktualnie": {
+                    "primaryColor":'rgb(226, 68, 92)',
+                    "tasks":[{
+                        text: 'build brand new car', title: "bmw", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "google", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "yahoo", deadline: "12/12/2020"
+                    },{
+                        text: 'build brand new car', title: "microsoft", deadline: "12/12/2020"
+                    }]
+                }
+            }]
+        });
+    })
+    // res.send({
+        
+    // });
 })
 
 module.exports = router;

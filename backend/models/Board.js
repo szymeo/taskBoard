@@ -5,6 +5,7 @@ var boardSchema = new Schema({
     title: String,
     primaryColor: String,
     createdAt: Date,
+    cols: [String],
     tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }]
 });
 

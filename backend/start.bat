@@ -1,1 +1,1 @@
-supervisor -w models,routes,app.js app.js
+supervisor -w models,endpoints.js,app.js app.js

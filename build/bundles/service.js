@@ -16,7 +16,21 @@ class TaskboardService {
             })
             .then(res => res.json())
             .catch(error => reject('Error:', error))
-            .then(response => setTimeout(() => resolve(response), 1000));
+            .then(response => setTimeout(() => resolve(response), 0));
+        })
+    }
+
+    createBoard() {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}board/`, {
+                method: 'POST',
+                headers: new Headers({
+                  'Content-Type': 'application/json'
+                })
+            })
+            .then(res => res.json())
+            .catch(error => reject('Error:', error))
+            .then(response => setTimeout(() => resolve(response), 0));
         })
     }
 
@@ -30,7 +44,7 @@ class TaskboardService {
             })
             .then(res => res.json())
             .catch(error => reject('Error:', error))
-            .then(response => setTimeout(() => resolve(response), 1000));
+            .then(response => setTimeout(() => resolve(response), 0));
         })
     }
 
@@ -58,24 +72,40 @@ class InterfaceService {
 
     buildBoardsTable() {
         var tables = ``;
-        this.interfaceData.map((board, index) => {
-            tables += this.buildBoard(board, index);
-        })
+        if(this.interfaceData && this.interfaceData.length > 0) {
+            this.interfaceData.map((board, index) => {
+                tables += this.buildBoard(board, index);
+            })
+        } else {
+            tables = ``;
+        }
+        
 
-        this.interface.innerHTML = tables;
+        this.interface.innerHTML = `${tables} <div class="create-board"><button onclick="eventHandler.createBoard()">Create board</button></div>`;
     }
 
     buildBoard(board, boardIndex) {
         const [boardTitle] = Object.keys(board);
-        let thRow = this.buildTHead(board[boardTitle].tasks[0], boardTitle, boardIndex, board[boardTitle].primaryColor);
-        let tdRows = this.buildTBody(board[boardTitle].tasks, board[boardTitle].primaryColor);
+        let thRow = this.buildTHead(board[boardTitle].cols, boardTitle, boardIndex, board[boardTitle].primaryColor);
+        let tdRows = this.buildTBody(board[boardTitle].tasks, boardTitle, boardIndex, board[boardTitle].primaryColor);
         return `<section class="board" data-id="${boardIndex}">
                     <table cellspacing="1" data-id="${boardIndex}">${thRow}${tdRows}</table>
                 </section>`
     }
 
-    buildTBody(tasks, primaryColor) {
+    buildTBody(tasks, boardTitle, boardIndex, primaryColor) {
         var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${primaryColor}"></div>`, i = 0;
+        if(tasks.length <= 0) return `<tr class="add-new-task"><td>
+                        ${firstCellStyle}
+                        <span class="left">
+                            <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Add new task (row)" maxlength="50" data-board="${boardTitle.hashCode()}" spellcheck="false" />
+                        </span>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button style="width:10%;height:100%;border:none;" onclick="eventHandler.addTask(${board._id})">Add</button>
+                    </td>
+                </tr>`;
 
         tasks.map((task) => {
             i = 0;
@@ -96,16 +126,17 @@ class InterfaceService {
     }
 
     buildTHead(headings, boardTitle, boardIndex, primaryColor) {
-        var thCells = ``, i = 0;
-        for(var k in headings) {
-            if(k === "text") thCells += `<th class="board-title">
-                <h4>
-                    <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Board title" maxlength="50" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
-                </h4>
-            </th>`
-        else
-            thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader("${k}", this.value, ${boardIndex})' value="${k}" spellcheck="false" /></th>`
-            i++;
+        var thCells = ``;
+        for(var i = 0; i < headings.length; i++) {
+            if(i == 0) {
+                thCells += `<th class="board-title">
+                    <h4>
+                        <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Board title" maxlength="50" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
+                    </h4>
+                </th>`
+            } else {
+                thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader("${headings[i]}", this.value, ${boardIndex})' value="${headings[i]}" spellcheck="false" /></th>`
+            }
         }
         return `<tr>${thCells}</tr>`
     }
@@ -128,6 +159,11 @@ class EventsService {
         this.api.updateBoard(this.boards[boardIndex]);
         
         document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
+    }
+
+    createBoard() {
+        this.api.createBoard()
+        .then(board => console.log(board));
     }
 
     updateBoardHeader(oldHeader, newHeader) {
