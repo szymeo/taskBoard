@@ -28,7 +28,16 @@ router.get("/image/:imagePath", function (req, res) {
 
 router.put('/board/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
-        
+        if(err || !board) {
+            return console.error(err);
+        }
+
+        board.title = req.body.title;
+        board.tasks = req.body.tasks;
+
+        board.save((err) => {
+            res.send(board);
+        })
     })
 })
 
@@ -51,11 +60,11 @@ router.post('/board', (req, res) => {
 router.post('/task/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
         var task = new Task({
-            
+            text: req.body.text
         })
 
         task.save((err) => {
-            err ? res.send(err).status(401) : res.send(task);
+            err ? res.send(err).status(401) : '';
         })
 
         board.tasks.push(task._id);
@@ -73,17 +82,8 @@ router.put('/task/:boardId', (req, res) => {
 router.get('/', (req, res) => {
     var _this = this;
     Board.find({}).exec((err, boards) => {
-        _this.boards = [];
-        var temp = {};
-
-        for(var i = 0; i < boards.length; i++) {
-            temp[boards[i].title] = boards[i];
-            _this.boards.push(temp);
-            temp = {};
-        }
-
         res.send({
-            boards:_this.boards,
+            boards:boards,
             "someboards":[{
                 "Sprint 1 - done": {
                     "primaryColor":'rgb(162, 93, 220)',

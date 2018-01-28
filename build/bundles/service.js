@@ -6,13 +6,14 @@ class TaskboardService {
     }
     
     updateBoard(boardObj) {
+        console.log(boardObj);
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}board/${boardObj._id}`, {
                 method: 'PUT',
                 headers: new Headers({
                   'Content-Type': 'application/json'
                 }),
-                body: boardObj
+                body: JSON.stringify(boardObj)
             })
             .then(res => res.json())
             .catch(error => reject('Error:', error))
@@ -48,11 +49,12 @@ class TaskboardService {
         })
     }
 
-    set addTask(data) {
+    addTask(boardId, taskText) {
         return new Promise((resolve, reject) => {
-            fetch(this.apiUrl, {
+            fetch(`${this.apiUrl}task/${boardId}`, {
                 method: 'POST',
-                body: JSON.stringify({'a':'s'}), 
+                // body: JSON.stringify({'a':'s'}),
+                body: {text: taskText}, 
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
@@ -85,20 +87,19 @@ class InterfaceService {
     }
 
     buildBoard(board, boardIndex) {
-        const [boardTitle] = Object.keys(board);
-        let thRow = this.buildTHead(board[boardTitle].cols, boardTitle, boardIndex, board[boardTitle].primaryColor);
-        let tdRows = this.buildTBody(board[boardTitle].tasks, boardTitle, boardIndex, board[boardTitle].primaryColor);
-        return `<section class="board" data-id="${boardIndex}">
-                    <table cellspacing="1" data-id="${boardIndex}">${thRow}${tdRows}</table>
+        let thRow = this.buildTHead(board.cols, board);
+        let tdRows = this.buildTBody(board.tasks, board);
+        return `<section class="board" data-id="${board._id}">
+                    <table cellspacing="1" data-id="${board._id}">${thRow}${tdRows}</table>
                 </section>`
     }
 
-    buildTBody(tasks, boardTitle, boardIndex, primaryColor) {
-        var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${primaryColor}"></div>`, i = 0;
+    buildTBody(tasks, board) {
+        var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${board.primaryColor}"></div>`, i = 0;
         if(tasks.length <= 0) return `<tr class="add-new-task"><td>
                         ${firstCellStyle}
                         <span class="left">
-                            <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Add new task (row)" maxlength="50" data-board="${boardTitle.hashCode()}" spellcheck="false" />
+                            <input type="text" style="color: ${board.primaryColor}" id="new-task-text" placeholder="Add new task (row)" maxlength="50" data-board="${board._id.hashCode()}" spellcheck="false" />
                         </span>
                     </td>
                     <td></td>
@@ -125,17 +126,17 @@ class InterfaceService {
         return tdRows;
     }
 
-    buildTHead(headings, boardTitle, boardIndex, primaryColor) {
+    buildTHead(headings, board) {
         var thCells = ``;
         for(var i = 0; i < headings.length; i++) {
             if(i == 0) {
                 thCells += `<th class="board-title">
                     <h4>
-                        <input type="text" style="color: ${primaryColor}" id="update-board-title" placeholder="Board title" maxlength="50" data-board="${boardTitle.hashCode()}" value="${boardTitle}" oninput='eventHandler.updateBoardTitle("${boardTitle}", this.value, ${boardIndex})' spellcheck="false" />
+                        <input type="text" style="color: ${board.primaryColor}" id="update-board-title" placeholder="Board title" maxlength="50" data-board="${board._id.hashCode()}" value="${board.title}" oninput='eventHandler.updateBoardTitle(this.value, "${board._id}")' spellcheck="false" />
                     </h4>
                 </th>`
             } else {
-                thCells += `<th><input type="text" data-board="${boardTitle.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader("${headings[i]}", this.value, ${boardIndex})' value="${headings[i]}" spellcheck="false" /></th>`
+                thCells += `<th><input type="text" data-board="${board._id.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader(this.value, "${board._id}")' value="${headings[i]}" spellcheck="false" /></th>`
             }
         }
         return `<tr>${thCells}</tr>`
@@ -148,17 +149,19 @@ class EventsService {
         this.boards = boards;
     }
 
-    updateBoardTitle(oldTitle, newTitle, boardIndex) {
-        newTitle = newTitle.replace(/([\\\"])/g, '');
-        const thisInput = document.querySelector(`table[data-id="${boardIndex}"] th > h4 > input`);
-        newTitle.length <= 0 ? newTitle = `Board_title_${boardIndex}` : '';
-        thisInput.setAttribute('oninput',  `eventHandler.updateBoardTitle("${newTitle}", this.value, ${boardIndex})`);
-        var newBoard = this.renameKeys(this.boards[boardIndex], {[oldTitle || "key"]:newTitle});
-        this.boards[boardIndex] = JSON.parse(JSON.stringify(newBoard));
-        this.boards[boardIndex].title = newTitle;
-        this.api.updateBoard(this.boards[boardIndex]);
+    updateBoardTitle(newTitle, boardId) {
+        var thisBoard = this.boards.find((board) => { return board._id == boardId });
+        thisBoard.title = newTitle;
+        this.api.updateBoard(thisBoard);
         
         document.querySelector('demo-out').innerHTML = JSON.stringify(this.boards, null, 10);
+    }
+
+    addTask(boardId) {
+        var taskText = document.querySelector(`input#new-task-text[data-board="${board._id.hashCode()}"]`).value;
+
+        this.api.addTask(boardId, taskText)
+        .then(task => console.log(task));
     }
 
     createBoard() {
