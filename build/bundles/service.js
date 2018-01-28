@@ -6,7 +6,6 @@ class TaskboardService {
     }
     
     updateBoard(boardObj) {
-        console.log(boardObj);
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}board/${boardObj._id}`, {
                 method: 'PUT',
@@ -53,8 +52,7 @@ class TaskboardService {
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}task/${boardId}`, {
                 method: 'POST',
-                // body: JSON.stringify({'a':'s'}),
-                body: {text: taskText}, 
+                body: JSON.stringify({text: taskText}),
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
@@ -104,20 +102,21 @@ class InterfaceService {
                     </td>
                     <td></td>
                     <td>
-                        <button style="width:10%;height:100%;border:none;" onclick="eventHandler.addTask(${board._id})">Add</button>
+                        <button style="width:10%;height:100%;border:none;" onclick='eventHandler.addTask("${board._id}")'>Add</button>
                     </td>
                 </tr>`;
 
+        console.log(board.cols);
         tasks.map((task) => {
             i = 0;
-            for(var k in task) {
+            for(var i = 0; i < board.cols.length; i++) {
+                console.log(task[board.cols[i]])
                 row += `
                     <td>
                         ${i == 0 ? firstCellStyle : ''}
-                        <span ${i == 0 ? 'class="left"' : ''}>${task[k]}</span>
+                        <span ${i == 0 ? 'class="left"' : ''}>${task[board.cols[i]] || ''}</span>
                     </td>
                 `;
-                i++;
             }
             tdRows += `<tr>${row}</tr>`;
             row = ``;
@@ -158,7 +157,7 @@ class EventsService {
     }
 
     addTask(boardId) {
-        var taskText = document.querySelector(`input#new-task-text[data-board="${board._id.hashCode()}"]`).value;
+        var taskText = document.querySelector(`input#new-task-text[data-board="${boardId.hashCode()}"]`).value;
 
         this.api.addTask(boardId, taskText)
         .then(task => console.log(task));

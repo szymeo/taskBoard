@@ -81,7 +81,7 @@ router.put('/task/:boardId', (req, res) => {
 
 router.get('/', (req, res) => {
     var _this = this;
-    Board.find({}).exec((err, boards) => {
+    Board.find({}).populate('tasks').exec((err, boards) => {
         res.send({
             boards:boards,
             "someboards":[{
