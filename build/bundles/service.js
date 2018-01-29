@@ -106,11 +106,9 @@ class InterfaceService {
                     </td>
                 </tr>`;
 
-        console.log(board.cols);
         tasks.map((task) => {
             i = 0;
             for(var i = 0; i < board.cols.length; i++) {
-                console.log(task[board.cols[i]])
                 row += `
                     <td>
                         ${i == 0 ? firstCellStyle : ''}
