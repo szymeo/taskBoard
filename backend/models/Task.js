@@ -7,8 +7,7 @@ var taskSchema = new Schema({
     deadline: Date,
     priority: String,
     createdAt: Date,
-    files: [],
-    type: String
+    files: []
 });
 
 module.exports = mongoose.model('Task', taskSchema);

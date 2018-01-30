@@ -93,6 +93,7 @@ class InterfaceService {
     }
 
     buildTBody(tasks, board) {
+        
         var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${board.primaryColor}"></div>`, i = 0;
         if(tasks.length <= 0) return `<tr class="add-new-task"><td>
                         ${firstCellStyle}
@@ -109,12 +110,10 @@ class InterfaceService {
         tasks.map((task) => {
             i = 0;
             for(var i = 0; i < board.cols.length; i++) {
-                row += `
-                    <td>
-                        ${i == 0 ? firstCellStyle : ''}
-                        <span ${i == 0 ? 'class="left"' : ''}>${task[board.cols[i]] || ''}</span>
-                    </td>
-                `;
+                row += `<td>
+                            ${i == 0 ? firstCellStyle : ''}
+                            <span ${i == 0 ? 'class="left"' : ''}>${this.getCell(task[board.cols[i]], board.cols[i], i, firstCellStyle)}</span>
+                        </td>`
             }
             tdRows += `<tr>${row}</tr>`;
             row = ``;
@@ -137,6 +136,16 @@ class InterfaceService {
             }
         }
         return `<tr>${thCells}</tr>`
+    }
+
+    getCell(value, type, i, firstCellStyle) {
+        const cellTypes = {
+            deadline: `<input id="date" type="date" value="${value}">`,
+            performer: `<input id="date" type="date" value="${value}">`,
+            text: `${value}`
+        }
+
+        return cellTypes[type];
     }
 }
 
