@@ -141,8 +141,13 @@ class InterfaceService {
     getCell(value, type, i, firstCellStyle) {
         const cellTypes = {
             deadline: `<input id="date" type="date" value="${value}">`,
-            performer: `<input id="date" type="date" value="${value}">`,
-            text: `${value}`
+            performer: `!todo`,
+            text: `${value}`,
+            priority: `<select onchange="eventHandler.changeTaskPriority()">
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>`
         }
 
         return cellTypes[type];

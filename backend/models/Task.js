@@ -2,10 +2,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var taskSchema = new Schema({
-    text: String,
-    assigned: [],
-    deadline: Date,
-    priority: String,
+    columns: [{
+        title: String,
+        alias: String,
+        type: String,
+        value: String
+    }],
     createdAt: Date,
     files: []
 });

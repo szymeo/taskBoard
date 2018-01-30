@@ -60,8 +60,17 @@ router.post('/board', (req, res) => {
 router.post('/task/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
         var task = new Task({
-            text: req.body.text
+            createdAt: new Date()
         })
+
+        for(var i = 0; i < board.cols.length; i++) {
+            task.columns.push({
+                title: String,
+                alias: String,
+                type: board.cols[i],
+                value: board.cols[i] == "text" ? req.body.text : ''
+            })
+        }
 
         task.save((err) => {
             err ? res.send(err).status(401) : '';
