@@ -112,7 +112,7 @@ class InterfaceService {
             for(var i = 0; i < board.cols.length; i++) {
                 row += `<td>
                             ${i == 0 ? firstCellStyle : ''}
-                            <span ${i == 0 ? 'class="left"' : ''}>${this.getCell(task[board.cols[i]], board.cols[i], i, firstCellStyle)}</span>
+                            <span ${i == 0 ? 'class="left"' : ''}>${this.getCell(task, board.cols, i)}</span>
                         </td>`
             }
             tdRows += `<tr>${row}</tr>`;
@@ -138,11 +138,16 @@ class InterfaceService {
         return `<tr>${thCells}</tr>`
     }
 
-    getCell(value, type, i, firstCellStyle) {
+    getCell(task, headings, index) {
+        const cell = task.columns.find((cell) => {
+            [this.first] = Object.keys(cell);
+            return this.first === headings[index];
+        })[headings[index]];
+
         const cellTypes = {
-            deadline: `<input id="date" type="date" value="${value}">`,
+            deadline: `<input id="date" type="date" value="${cell.value}">`,
             performer: `!todo`,
-            text: `${value}`,
+            text: `${cell.value}`,
             priority: `<select onchange="eventHandler.changeTaskPriority()">
                             <option value="high">High</option>
                             <option value="medium">Medium</option>
@@ -150,7 +155,7 @@ class InterfaceService {
                         </select>`
         }
 
-        return cellTypes[type];
+        return cellTypes[cell.type];
     }
 }
 

@@ -57,19 +57,27 @@ router.post('/board', (req, res) => {
     })
 })
 
+String.prototype.ucFirst = function() {
+    var firstLetter = this.substr(0, 1);
+    return firstLetter.toUpperCase() + this.substr(1);
+}
+
 router.post('/task/:boardId', (req, res) => {
     Board.findOne({_id: req.params.boardId}).exec((err, board) => {
         var task = new Task({
-            createdAt: new Date()
-        })
+            createdAt: new Date(),
+            columns: []
+        }), temp = {};
 
         for(var i = 0; i < board.cols.length; i++) {
-            task.columns.push({
-                title: String,
-                alias: String,
-                type: board.cols[i],
+            temp = {};
+            temp[board.cols[i]] = {
+                title: board.cols[i].ucFirst(),
+                type: board.cols[i], // !todo in future more cell types
                 value: board.cols[i] == "text" ? req.body.text : ''
-            })
+            };
+
+            task.columns.push(temp);
         }
 
         task.save((err) => {
