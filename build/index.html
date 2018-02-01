@@ -43,23 +43,68 @@
                 padding: 0;
             }
 
+            taskboard .btn {
+                cursor: pointer;
+            }
+
+            taskboard .btn.darkness-purple {
+                background-color: rgb(93, 0, 127);
+                color: #fff;
+            }
+
+            taskboard .font-w-300 {
+                font-weight: 300;
+            }
+
+            taskboard .font-w-400 {
+                font-weight: 400;
+            }
+
+            taskboard .font-w-700 {
+                font-weight: 700;
+            }
+
+            taskboard > section > table > tbody > tr .btn {
+                width: 10%;
+                height: 100%;
+                border: none;
+            }
+
             taskboard > section > table > tbody > tr.add-new-task > td {
                 background-color: transparent;
+                /* border-top: 1px solid rgb(238, 238, 238) */
+                border-bottom: none;
             }
 
             taskboard > section > table > tbody > tr.add-new-task span, taskboard > section > table > tbody > tr.add-new-task input {
-                height: 34px;
-                border: none;
                 padding: 0 6px;
             }
 
+            taskboard > section > table > tbody > tr.add-new-task input {
+                height: 32px;
+                width: 100%;
+                border: none;
+            }
+
             taskboard > section > table td > span {
+                height: 34px;
                 line-height: 34px;
                 padding: 0 6px;
             }
 
             taskboard > section > table td > span.left {
                 float:left;
+                width: calc(100% - 8px);
+                text-align: left;
+            }
+
+            taskboard > section > table > tbody > tr.add-new-task td.action-btn {
+                text-align: right;
+            }
+
+            taskboard > section > table > tbody > tr.add-new-task td > span.left {
+                border: 1px solid rgb(238, 238, 238);
+                border-right-color: transparent;
             }
 
             taskboard > section > table th:hover {

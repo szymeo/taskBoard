@@ -87,7 +87,7 @@ router.post('/task/:boardId', (req, res) => {
         board.tasks.push(task._id);
     
         board.save((err) => {
-            err ? res.send(err).status(403) : res.send(board);
+            err ? res.send(err).status(403) : res.send(task);
         })
     })
 })

@@ -84,7 +84,7 @@ class InterfaceService {
         this.interface.innerHTML = `${tables} <div class="create-board"><button onclick="eventHandler.createBoard()">Create board</button></div>`;
     }
 
-    buildBoard(board, boardIndex) {
+    buildBoard(board) {
         let thRow = this.buildTHead(board.cols, board);
         let tdRows = this.buildTBody(board.tasks, board);
         return `<section class="board" data-id="${board._id}">
@@ -92,20 +92,33 @@ class InterfaceService {
                 </section>`
     }
 
+    refetchBoard(boardId) {
+        var board = document.querySelector(`section.board[data-id="${boardId}"]`);
+        var thisBoard = this.interfaceData.find((board) => { return board._id == boardId });
+        let thRow = this.buildTHead(thisBoard.cols, thisBoard);
+        let tdRows = this.buildTBody(thisBoard.tasks, thisBoard);
+
+        board.innerHTML = `<table cellspacing="1" data-id="${board._id}">${thRow}${tdRows}</table>`;
+    }
+
     buildTBody(tasks, board) {
         
-        var tdRows = ``, row = ``, firstCellStyle = `<div class="row-select" style="background-color:${board.primaryColor}"></div>`, i = 0;
-        if(tasks.length <= 0) return `<tr class="add-new-task"><td>
-                        ${firstCellStyle}
-                        <span class="left">
-                            <input type="text" style="color: ${board.primaryColor}" id="new-task-text" placeholder="Add new task (row)" maxlength="50" data-board="${board._id.hashCode()}" spellcheck="false" />
-                        </span>
-                    </td>
-                    <td></td>
-                    <td>
-                        <button style="width:10%;height:100%;border:none;" onclick='eventHandler.addTask("${board._id}")'>Add</button>
-                    </td>
-                </tr>`;
+        var tdRows = ``, 
+            row = ``, 
+            firstCellStyle = `<div class="row-select" style="background-color:${board.primaryColor}"></div>`,
+            i = 0,
+            addNewTask = `<tr class="add-new-task"><td>
+                    ${firstCellStyle}
+                    <span class="left">
+                        <input type="text" style="color: ${board.primaryColor}" id="new-task-text" placeholder="Add new task (row)" maxlength="50" data-board="${board._id.hashCode()}" spellcheck="false" />
+                    </span>
+                </td>
+                ${this.fillBetweenCells(board.cols.length - 2)}
+                <td class="action-btn">
+                    <button class="btn font-w-400 darkness-purple" onclick='eventHandler.addTask("${board._id}")'>Add</button>
+                </td>
+            </tr>`;
+        if(tasks.length <= 0) return addNewTask;
 
         tasks.map((task) => {
             i = 0;
@@ -119,7 +132,7 @@ class InterfaceService {
             row = ``;
         })
 
-        return tdRows;
+        return `${tdRows}${addNewTask}`;
     }
 
     buildTHead(headings, board) {
@@ -136,6 +149,14 @@ class InterfaceService {
             }
         }
         return `<tr>${thCells}</tr>`
+    }
+
+    fillBetweenCells(colCount) {
+        this.out = ``;
+        for(var i = 0; i < colCount; i++) {
+            this.out += `<td><div></div></td>`
+        }
+        return this.out;
     }
 
     getCell(task, headings, index) {
@@ -160,8 +181,9 @@ class InterfaceService {
 }
 
 class EventsService {
-    constructor(boards, api) {
+    constructor(boards, api, interfaceService) {
         this.api = api;
+        this.interface = interfaceService;
         this.boards = boards;
     }
 
@@ -175,9 +197,13 @@ class EventsService {
 
     addTask(boardId) {
         var taskText = document.querySelector(`input#new-task-text[data-board="${boardId.hashCode()}"]`).value;
+        var thisBoard = this.boards.find((board) => { return board._id == boardId });
 
-        this.api.addTask(boardId, taskText)
-        .then(task => console.log(task));
+        taskText.length > 0 ? this.api.addTask(boardId, taskText)
+        .then((task) => {
+            thisBoard.tasks.push(task);
+            this.interface.refetchBoard(thisBoard._id);
+        }) : '';
     }
 
     createBoard() {
@@ -236,10 +262,10 @@ class EventsService {
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
         _this.boards = await apiService.getBoards;
-        window.eventHandler = new EventsService(_this.boards['boards'], apiService);
-        document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
-        taskboard.innerHTML = '';
         _this.interface = new InterfaceService(taskboard, _this.boards['boards']);
+        window.eventHandler = new EventsService(_this.boards['boards'], apiService, _this.interface);
+        // document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
+        // taskboard.innerHTML = '';
         _this.interface.buildBoardsTable();
     }();
 })();
