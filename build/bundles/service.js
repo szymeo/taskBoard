@@ -48,6 +48,20 @@ class TaskboardService {
         })
     }
 
+    get getPerformers() {
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}performers`, {
+                method: 'GET',
+                headers: new Headers({
+                  'Content-Type': 'application/json'
+                })
+            })
+            .then(res => res.json())
+            .catch(error => reject('Error:', error))
+            .then(response => setTimeout(() => resolve(response), 0));
+        })
+    }
+
     addTask(boardId, taskText) {
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}task/${boardId}`, {
@@ -65,9 +79,14 @@ class TaskboardService {
 }
 
 class InterfaceService {
-    constructor(element, data) {
+    constructor(element, data, performers) {
         this.interface = element;
         this.interfaceData = data;
+        this.performers = performers;
+
+        this.cellsData = {
+            performers: this.performers
+        }
     }
 
     buildBoardsTable() {
@@ -145,7 +164,7 @@ class InterfaceService {
                     </h4>
                 </th>`
             } else {
-                thCells += `<th><input type="text" data-board="${board._id.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader(this.value, "${board._id}")' value="${headings[i]}" spellcheck="false" /></th>`
+                thCells += `<th><input type="text" data-board="${board._id.hashCode()}" data-header="${i}" oninput='eventHandler.updateBoardHeader(this.value, "${board._id}")' value="${headings[i].title}" spellcheck="false" /></th>`
             }
         }
         return `<tr>${thCells}</tr>`
@@ -162,18 +181,27 @@ class InterfaceService {
     getCell(task, headings, index) {
         const cell = task.columns.find((cell) => {
             [this.first] = Object.keys(cell);
-            return this.first === headings[index];
-        })[headings[index]];
+            return this.first === headings[index].type;
+        })[headings[index].type];
 
         const cellTypes = {
-            deadline: `<input id="date" type="date" value="${cell.value}">`,
-            performer: `!todo`,
+            date: `<input id="date" type="date" value="${cell.value}">`,
+            performer: `<select onchange="eventHandler.changeTaskPriority()">
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>`,
             text: `${cell.value}`,
             priority: `<select onchange="eventHandler.changeTaskPriority()">
                             <option value="high">High</option>
                             <option value="medium">Medium</option>
                             <option value="low">Low</option>
-                        </select>`
+                        </select>`,
+            status: `<select onchange="eventHandler.changeTaskPriority()">
+                        <option value="high">Todo</option>
+                        <option value="medium">Working on it</option>
+                        <option value="low">Done</option>
+                    </select>`,
         }
 
         return cellTypes[cell.type];
@@ -262,7 +290,8 @@ class EventsService {
     var fillTasks = async function() {
         taskboard.innerHTML = "Loading...";
         _this.boards = await apiService.getBoards;
-        _this.interface = new InterfaceService(taskboard, _this.boards['boards']);
+        _this.performers = await apiService.getPerformers;
+        _this.interface = new InterfaceService(taskboard, _this.boards['boards'], _this.performers);
         window.eventHandler = new EventsService(_this.boards['boards'], apiService, _this.interface);
         // document.querySelector('demo-out').innerHTML = JSON.stringify(_this.boards['boards'], null, 10);
         // taskboard.innerHTML = '';

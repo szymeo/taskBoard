@@ -41,15 +41,43 @@ router.put('/board/:boardId', (req, res) => {
     })
 })
 
+router.get('/performers', (req, res) => {
+    res.send([{
+        "_id" : "574e9686eeffa45717deed1e",
+        "email" : "szymon@foo.pl",
+        "isAdmin" : true
+    },{
+        "_id" : "574e9686eeffa45717dced1e",
+        "email" : "some@foo.pl",
+        "isAdmin" : false
+    }])
+})
+
 router.post('/board', (req, res) => {
     var board = new Board({
         title: "New board",
-        primaryColor: 'rgb(162, 93, 220)',
-        cols: [
-            'text',
-            'Performer',
-            'Deadline'
-        ]
+        primaryColor: 'rgb(62, 93, 120)',
+        cols: [{
+            title: 'Whatever',
+            type: 'text',
+            unique: true
+        },{
+            title: 'Performer',
+            type: 'performer',
+            unique: true
+        },{
+            title: 'Deadline',
+            type: 'date',
+            unique: false
+        },{
+            title: 'Priority',
+            type: 'priority',
+            unique: true
+        },{
+            title: 'Status',
+            type: 'status',
+            unique: true
+        }]
     })
 
     board.save((err) => {
@@ -71,10 +99,10 @@ router.post('/task/:boardId', (req, res) => {
 
         for(var i = 0; i < board.cols.length; i++) {
             temp = {};
-            temp[board.cols[i]] = {
-                title: board.cols[i].ucFirst(),
-                type: board.cols[i], // !todo in future more cell types
-                value: board.cols[i] == "text" ? req.body.text : ''
+            temp[board.cols[i].type] = {
+                title: board.cols[i].title,
+                type: board.cols[i].type, // !todo in future more cell types
+                value: board.cols[i].type == "text" ? req.body.text : ''
             };
 
             task.columns.push(temp);
@@ -95,6 +123,8 @@ router.post('/task/:boardId', (req, res) => {
 router.put('/task/:boardId', (req, res) => {
 
 })
+
+router.get('/')
 
 router.get('/', (req, res) => {
     var _this = this;
