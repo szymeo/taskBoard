@@ -144,7 +144,7 @@ class InterfaceService {
             for(var i = 0; i < board.cols.length; i++) {
                 row += `<td>
                             ${i == 0 ? firstCellStyle : ''}
-                            <span ${i == 0 ? 'class="left"' : ''}>${this.getCell(task, board.cols, i)}</span>
+                            <span ${i == 0 ? 'class="left"' : ''}>${this.getCell(task, board.cols, i, this.cellsData)}</span>
                         </td>`
             }
             tdRows += `<tr>${row}</tr>`;
@@ -178,18 +178,23 @@ class InterfaceService {
         return this.out;
     }
 
-    getCell(task, headings, index) {
+    getCell(task, headings, index, cellsData) {
         const cell = task.columns.find((cell) => {
             [this.first] = Object.keys(cell);
             return this.first === headings[index].type;
         })[headings[index].type];
 
+        function createPerformers(arr, out = '') {
+            for(var i = 0; i < arr.length; i++) {
+                out += `<option value="${arr[i]._id}>${arr[i].name}</option>"`;
+            }
+            return out;
+        }
+
         const cellTypes = {
             date: `<input id="date" type="date" value="${cell.value}">`,
             performer: `<select onchange="eventHandler.changeTaskPriority()">
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
+                            ${createPerformers(cellsData.performers)}
                         </select>`,
             text: `${cell.value}`,
             priority: `<select onchange="eventHandler.changeTaskPriority()">
